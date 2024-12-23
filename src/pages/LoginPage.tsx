@@ -1,5 +1,5 @@
 import { useState, FocusEvent, ChangeEvent,useContext } from "react";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { useNavigate } from "react-router";
 import { AuthContext } from "../context/AuthContext";
 function LoginPage() {
@@ -9,6 +9,7 @@ function LoginPage() {
   const [passwordError, setPasswordError] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [errMessage,setErrMessage]=useState('')
 
   const authContext = useContext(AuthContext);
 
@@ -54,6 +55,11 @@ function LoginPage() {
       console.log(res.data.success)
     } catch (err) {
       console.log(err);
+      if (err instanceof AxiosError) {
+        setErrMessage(err.response?.data.message || 'An unknown error occurred');
+      } else {
+        setErrMessage('An unknown error occurred');
+      }
     } finally {
       setIsLoading(false);
     }
@@ -62,9 +68,11 @@ function LoginPage() {
   const handleFocus = (e: FocusEvent<HTMLInputElement>) => {
     if (e.target.type === "email") {
       setEmailError(null); // Clear the email error on focus
+      setErrMessage('')
     }
     if (e.target.type === "password") {
       setPasswordError(null); // Clear the email error on focus
+      setErrMessage('')
     }
   };
 
@@ -164,6 +172,9 @@ function LoginPage() {
           value={isLoading ? "Loading..." : "Login"}
           disabled={isLoading}
         />
+        {
+          errMessage&&<span className="text-red-500 text-sm">{errMessage}</span>
+        }
       </form>
     </div>
   );

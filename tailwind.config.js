@@ -5,7 +5,12 @@ export default {
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
-    extend: {},
+    extend: {
+      fontFamily: {
+        retro: ['Jersey', 'monospace'], // Add your retro font
+      },
+    },
+
   },
   plugins: [],
 }

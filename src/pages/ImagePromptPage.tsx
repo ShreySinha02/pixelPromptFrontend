@@ -9,7 +9,7 @@ function ImagePromptPage() {
 
   const handleSubmit = async(e:FormEvent) => {
     e.preventDefault();
-   
+    setImage(null)
     setLoading(true)
     try {
       const data={prompt}
@@ -34,7 +34,8 @@ function ImagePromptPage() {
   return (
     <div className=" w-screen h-screen flex items-center justify-center flex-col space-y-2">
       <div className=" w-full flex items-center justify-center ">
-       {imageUrl&& <img className="w-2/6" src={imageUrl} alt="image"/>}
+        {loading&&<div>loading...</div>}
+       {imageUrl&& <img className="w-2/6 rounded-md" src={imageUrl} alt="image"/>}
       </div>
       <div className="w-4/12 relative  rounded-md ">
         <form name="image" onSubmit={handleSubmit}>

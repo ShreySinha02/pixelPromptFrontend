@@ -13,9 +13,9 @@ function Navbar() {
         localStorage.removeItem('accessToken')
     }
   return (
-    <div className='w-full h-12 bg-gray-600 flex flex-row justify-between p-4 items-center  fixed top-0'>
+    <div className='w-full h-12 bg-gray-600 font-retro text-xl  flex flex-row justify-between p-4 items-center  fixed top-0'>
         <div >
-        <NavLink to="">Logo</NavLink>
+        <NavLink className="font-bold" to="">PixelPrompt</NavLink>
         </div>
         <div >
             {!state.isAuthenticated?(<div className=' flex flex-row space-x-2'>

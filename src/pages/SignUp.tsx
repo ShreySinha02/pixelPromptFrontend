@@ -1,4 +1,6 @@
 import { useState, FocusEvent, ChangeEvent } from "react";
+import axios, { AxiosError } from "axios";
+import {  useNavigate } from "react-router";
 
 function SignUp() {
   const [email, setEmail] = useState("");
@@ -6,20 +8,62 @@ function SignUp() {
   const [emailError, setEmailError] = useState<string | null>(null);
   const [passwordError, setPasswordError] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [message,setMessage]=useState("")
+  const [errMessage,setErrMessage]=useState("")
+ 
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const navigate=useNavigate()
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Email:", email);
-    console.log("Password:", password);
+    if (!email) {
+      setEmailError("Email is required");
+      return;
+    }
+    if (!password) {
+      setPasswordError("Password is required");
+      return;
+    }
+
+  
+    setIsLoading(true);
+    try {
+      const data = { email, password };
+      const res = await axios.post(
+        `${import.meta.env.VITE_BASE_URL}/users/register`,
+        data,{
+            headers:{
+                "Content-Type": "application/json"
+            }
+        }
+      );
+
+      console.log(res)
+      if(res.data.success) navigate('/login')
+      setMessage(res.data.message)
+    } catch (err:unknown) {
+      if (err instanceof AxiosError) {
+        setErrMessage(err.response?.data.message || 'An unknown error occurred');
+      } else {
+        setErrMessage('An unknown error occurred');
+      }
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleFocus = (e: FocusEvent<HTMLInputElement>) => {
     if (e.target.type === "email") {
       setEmailError(null); // Clear the email error on focus
+      setErrMessage('')
+      setMessage('')
     }
     if (e.target.type === "password") {
-        setPasswordError(null); // Clear the email error on focus
-      }
+      setPasswordError(null); // Clear the email error on focus
+      setErrMessage('')
+      setMessage('')
+    }
   };
 
   const handleBlur = (e: FocusEvent<HTMLInputElement>) => {
@@ -86,6 +130,8 @@ function SignUp() {
             value={password}
             onChange={handleChange}
             onBlur={handleBlur}
+            onFocus={handleFocus}
+            autoComplete="true"
             placeholder="Please Enter password"
           />
           <button
@@ -109,10 +155,19 @@ function SignUp() {
         </div>
 
         <input
-          className="h-10 rounded-md bg-slate-900 text-white cursor-pointer"
+          className={`h-10 rounded-md bg-slate-900 text-white cursor-pointer ${
+            isLoading ? "opacity-70 cursor-not-allowed" : ""
+          }`}
           type="submit"
-          value="Sign Up"
+          value={isLoading ? "Loading..." : "Sign up"}
+          disabled={isLoading}
         />
+        {
+          errMessage&&<span className="text-red-500 text-sm">{errMessage}</span>
+        }
+        {
+          message&&<span className="text-green-500 text-sm">{message}</span>
+        }
       </form>
     </div>
   );
